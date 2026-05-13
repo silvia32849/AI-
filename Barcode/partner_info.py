@@ -1,6 +1,7 @@
 import db
 import requests
 
+
 # ==========================================
 # 제휴사 조회
 # ==========================================
@@ -43,4 +44,3 @@ def get_partner_info(barcode):
         return None
 
     return data[0]
-
