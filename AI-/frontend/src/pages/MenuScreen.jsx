@@ -13,18 +13,14 @@ function MenuScreen() {
 
   useEffect(() => {
     if (showFAQ) return;
-
     const timer = setTimeout(() => {
       setShowFAQ(true);
     }, 10000);
-
     return () => clearTimeout(timer);
   }, [showFAQ]);
 
   const handleUserAction = () => {
-    if (!showFAQ) {
-      setShowFAQ(false);
-    }
+    if (!showFAQ) setShowFAQ(false);
   };
 
   const handlePayment = () => {
@@ -39,22 +35,16 @@ function MenuScreen() {
       <div style={styles.header}>
         <button
           style={styles.homeBtn}
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate('/');
-          }}
+          onClick={(e) => { e.stopPropagation(); navigate('/'); }}
         >
-          🏠 Home
+          Home
         </button>
-        <h2 style={styles.title}>☕ EASY CAFE</h2>
+        <h2 style={styles.title}>EASY CAFE</h2>
         <button
           style={styles.faqBtn}
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowFAQ(true);
-          }}
+          onClick={(e) => { e.stopPropagation(); setShowFAQ(true); }}
         >
-          ❓ FAQ
+          FAQ
         </button>
       </div>
 
@@ -65,8 +55,8 @@ function MenuScreen() {
             key={cat}
             style={{
               ...styles.tab,
-              backgroundColor: selectedCategory === cat ? '#6f4e37' : '#eee',
-              color: selectedCategory === cat ? 'white' : 'black',
+              backgroundColor: selectedCategory === cat ? '#00754a' : '#d4e9e2',
+              color: selectedCategory === cat ? '#ffffff' : '#000000',
             }}
             onClick={() => setSelectedCategory(cat)}
           >
@@ -82,7 +72,8 @@ function MenuScreen() {
             key={item.id}
             style={{
               ...styles.card,
-              border: selectedItem?.id === item.id ? '3px solid #6f4e37' : '3px solid transparent',
+              border: selectedItem?.id === item.id ? '3px solid #00754a' : '3px solid #f5f5f5',
+              boxShadow: selectedItem?.id === item.id ? '0 4px 15px rgba(0,117,74,0.2)' : '0 2px 8px rgba(0,0,0,0.06)',
             }}
             onClick={() => setSelectedItem(item)}
           >
@@ -101,7 +92,7 @@ function MenuScreen() {
             : '메뉴를 선택해주세요'}
         </span>
         <button style={styles.payBtn} onClick={handlePayment}>
-          결제하기 →
+          결제하기
         </button>
       </div>
 
@@ -109,14 +100,10 @@ function MenuScreen() {
       {showFAQ && (
         <div style={styles.faqOverlay}>
           <div style={styles.faqModal} onClick={(e) => e.stopPropagation()}>
-            <button
-              style={styles.faqCloseBtn}
-              onClick={() => setShowFAQ(false)}
-            >
+            <button style={styles.faqCloseBtn} onClick={() => setShowFAQ(false)}>
               ✕
             </button>
-            {/* 여기에 <FAQScreen /> 컴포넌트 붙이면 됩니다 */}
-            <h3 style={{ fontSize: '28px' }}>❓ 자주 묻는 질문</h3>
+            <h3 style={{ fontSize: '28px', color: '#00754a' }}>자주 묻는 질문</h3>
             <p style={{ color: '#888', marginTop: '10px' }}>FAQ 컴포넌트 들어올 자리</p>
           </div>
         </div>
@@ -128,56 +115,75 @@ function MenuScreen() {
 const styles = {
   container: {
     display: 'flex', flexDirection: 'column',
-    height: '100vh', backgroundColor: '#fff8f0',
+    height: '100vh', backgroundColor: '#ffffff',
     position: 'relative'
   },
   header: {
     display: 'flex', justifyContent: 'space-between',
-    alignItems: 'center', padding: '20px 30px'
+    alignItems: 'center', padding: '20px 40px',
+    backgroundColor: '#ffffff',
+    borderBottom: '1px solid #f0f0f0'
   },
   title: {
-    fontSize: '28px',
-    position: 'absolute',
-    left: '50%',
+    fontSize: '28px', color: '#00754a',
+    position: 'absolute', left: '50%',
     transform: 'translateX(-50%)',
+    fontWeight: 'bold',
+    letterSpacing: '1px'
   },
   homeBtn: {
-    padding: '10px 20px', fontSize: '18px',
-    borderRadius: '10px', border: 'none',
-    backgroundColor: '#6f4e37', color: 'white', cursor: 'pointer'
+    padding: '12px 24px', fontSize: '16px',
+    borderRadius: '25px', border: '2px solid #00754a',
+    backgroundColor: '#ffffff', color: '#00754a', 
+    cursor: 'pointer', fontWeight: 'bold',
+    transition: 'all 0.2s'
   },
   faqBtn: {
-    padding: '10px 20px', fontSize: '18px',
-    borderRadius: '10px', border: 'none',
-    backgroundColor: '#6f4e37', color: 'white', cursor: 'pointer'
+    padding: '12px 24px', fontSize: '16px',
+    borderRadius: '25px', border: '2px solid #00754a',
+    backgroundColor: '#ffffff', color: '#00754a',
+    cursor: 'pointer', fontWeight: 'bold',
+    transition: 'all 0.2s'
   },
-  tabs: { display: 'flex', gap: '10px', padding: '0 30px', marginBottom: '20px' },
+  tabs: {
+    display: 'flex', gap: '12px',
+    padding: '20px 40px', backgroundColor: '#ffffff',
+  },
   tab: {
-    padding: '12px 24px', fontSize: '18px',
-    borderRadius: '10px', border: 'none', cursor: 'pointer'
+    padding: '14px 28px', fontSize: '17px',
+    borderRadius: '25px', border: 'none', cursor: 'pointer',
+    fontWeight: 'bold', transition: 'all 0.2s'
   },
   grid: {
     display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '20px', padding: '0 30px', flex: 1,
-    overflowY: 'auto'
+    gap: '24px', padding: '24px 40px', flex: 1,
+    overflowY: 'auto', backgroundColor: '#fafafa'
   },
   card: {
-    backgroundColor: 'white', borderRadius: '15px',
-    padding: '20px', textAlign: 'center', cursor: 'pointer'
+    backgroundColor: '#ffffff', borderRadius: '12px',
+    padding: '24px', textAlign: 'center', cursor: 'pointer',
+    transition: 'all 0.2s'
   },
-  emoji: { fontSize: '48px', marginBottom: '10px' },
-  itemName: { fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' },
-  itemPrice: { fontSize: '18px', color: '#6f4e37' },
+  emoji: { fontSize: '52px', marginBottom: '12px' },
+  itemName: { 
+    fontSize: '19px', fontWeight: 'bold', 
+    marginBottom: '8px', color: '#000000' 
+  },
+  itemPrice: { 
+    fontSize: '17px', color: '#00754a', fontWeight: 'bold' 
+  },
   bottomBar: {
     display: 'flex', justifyContent: 'space-between',
-    alignItems: 'center', padding: '20px 30px',
-    backgroundColor: 'white', borderTop: '1px solid #eee'
+    alignItems: 'center', padding: '24px 40px',
+    backgroundColor: '#ffffff', borderTop: '1px solid #f0f0f0'
   },
-  selectedText: { fontSize: '20px' },
+  selectedText: { fontSize: '19px', color: '#000000', fontWeight: '500' },
   payBtn: {
-    padding: '15px 30px', fontSize: '20px',
-    backgroundColor: '#6f4e37', color: 'white',
-    border: 'none', borderRadius: '10px', cursor: 'pointer'
+    padding: '16px 36px', fontSize: '18px',
+    backgroundColor: '#00754a', color: '#ffffff',
+    border: 'none', borderRadius: '25px', cursor: 'pointer',
+    fontWeight: 'bold', transition: 'all 0.2s',
+    boxShadow: '0 2px 8px rgba(0,117,74,0.3)'
   },
   faqOverlay: {
     position: 'fixed', top: 0, left: 0,
@@ -187,14 +193,15 @@ const styles = {
     zIndex: 1000
   },
   faqModal: {
-    backgroundColor: 'white', borderRadius: '20px',
+    backgroundColor: '#ffffff', borderRadius: '16px',
     padding: '40px', width: '600px', minHeight: '400px',
     position: 'relative', textAlign: 'center'
   },
   faqCloseBtn: {
-    position: 'absolute', top: '15px', right: '20px',
-    fontSize: '24px', border: 'none',
-    backgroundColor: 'transparent', cursor: 'pointer'
+    position: 'absolute', top: '20px', right: '24px',
+    fontSize: '28px', border: 'none',
+    backgroundColor: 'transparent', cursor: 'pointer',
+    color: '#000000'
   },
 };
 

@@ -26,44 +26,54 @@ function BarcodeScreen() {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.title}>🎟️ 바코드 결제</h2>
+      <h2 style={styles.title}>바코드 결제</h2>
 
       <div style={styles.barcodeBox}>
         <p style={styles.barcodeNum}>{barcodeData?.code || '----'}</p>
       </div>
 
       <div style={styles.infoBox}>
-        <p>명칭: {barcodeData?.type}</p>
-        <p>잔여 금액: {remain.toLocaleString()}원</p>
-        <p>받을 금액: {price.toLocaleString()}원</p>
-        <p style={{
-          ...styles.finalPrice,
-          color: isEnough ? '#6f4e37' : '#ff4444'
-        }}>
-          결제 금액: {finalPrice.toLocaleString()}원
-        </p>
+        <div style={styles.infoRow}>
+          <span>명칭</span>
+          <span style={styles.infoValue}>{barcodeData?.type}</span>
+        </div>
+        <div style={styles.infoRow}>
+          <span>잔여 금액</span>
+          <span style={styles.infoValue}>{remain.toLocaleString()}원</span>
+        </div>
+        <div style={styles.infoRow}>
+          <span>받을 금액</span>
+          <span style={styles.infoValue}>{price.toLocaleString()}원</span>
+        </div>
+        <div style={{...styles.infoRow, marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #f0f0f0'}}>
+          <span style={styles.finalLabel}>결제 금액</span>
+          <span style={{
+            ...styles.finalPrice,
+            color: isEnough ? '#00754a' : '#d32f2f'
+          }}>{finalPrice.toLocaleString()}원</span>
+        </div>
         {!isEnough && (
           <p style={styles.warningText}>
-            ⚠️ 잔여금액이 부족합니다
+            잔여금액이 부족합니다
           </p>
         )}
       </div>
 
       <div style={styles.btnWrapper}>
         <button
-          style={{ ...styles.btn, backgroundColor: '#aaa' }}
+          style={styles.retryBtn}
           onClick={() => navigate('/barcode-camera', { state: { item } })}
         >
-          🔍 재조회
+          재조회
         </button>
         <button
           style={{
-            ...styles.btn,
-            backgroundColor: isEnough ? '#6f4e37' : '#ff4444'
+            ...styles.useBtn,
+            backgroundColor: isEnough ? '#00754a' : '#d32f2f'
           }}
           onClick={handleUse}
         >
-          {isEnough ? '✅ 사용' : '💳 잔여금액 결제 후 이동'}
+          {isEnough ? '사용' : '다른 결제수단'}
         </button>
       </div>
     </div>
@@ -74,23 +84,43 @@ const styles = {
   container: {
     display: 'flex', flexDirection: 'column',
     alignItems: 'center', justifyContent: 'center',
-    height: '100vh', backgroundColor: '#fff8f0', gap: '30px'
+    height: '100vh', backgroundColor: '#ffffff', gap: '32px'
   },
-  title: { fontSize: '36px' },
-  barcodeBox: { textAlign: 'center' },
-  barcodeNum: { fontSize: '24px', letterSpacing: '4px', color: '#333' },
+  title: { fontSize: '32px', color: '#00754a', fontWeight: 'bold' },
+  barcodeBox: { 
+    textAlign: 'center', 
+    padding: '20px',
+    backgroundColor: '#fafafa',
+    borderRadius: '8px'
+  },
+  barcodeNum: { fontSize: '22px', letterSpacing: '3px', color: '#000000', fontWeight: '500' },
   infoBox: {
-    backgroundColor: 'white', padding: '30px',
-    borderRadius: '15px', fontSize: '20px',
-    lineHeight: '2', textAlign: 'center', minWidth: '300px'
+    backgroundColor: '#fafafa', padding: '32px',
+    borderRadius: '12px', minWidth: '400px'
   },
-  finalPrice: { fontWeight: 'bold', fontSize: '24px' },
-  warningText: { color: '#ff4444', fontSize: '18px' },
-  btnWrapper: { display: 'flex', gap: '30px' },
-  btn: {
-    padding: '15px 40px', fontSize: '20px',
-    borderRadius: '10px', border: 'none',
-    color: 'white', cursor: 'pointer'
+  infoRow: {
+    display: 'flex', justifyContent: 'space-between',
+    fontSize: '18px', marginBottom: '12px',
+    color: '#000000'
+  },
+  infoValue: { fontWeight: '500' },
+  finalLabel: { fontSize: '20px', fontWeight: 'bold' },
+  finalPrice: { fontSize: '24px', fontWeight: 'bold' },
+  warningText: { 
+    color: '#d32f2f', fontSize: '16px', 
+    textAlign: 'center', marginTop: '12px' 
+  },
+  btnWrapper: { display: 'flex', gap: '20px' },
+  retryBtn: {
+    padding: '14px 36px', fontSize: '18px',
+    borderRadius: '25px', border: '2px solid #00754a',
+    backgroundColor: '#ffffff', color: '#00754a',
+    cursor: 'pointer', fontWeight: 'bold'
+  },
+  useBtn: {
+    padding: '14px 36px', fontSize: '18px',
+    borderRadius: '25px', border: 'none',
+    color: '#ffffff', cursor: 'pointer', fontWeight: 'bold'
   },
 };
 

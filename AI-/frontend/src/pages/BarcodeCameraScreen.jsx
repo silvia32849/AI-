@@ -46,7 +46,7 @@ function BarcodeCameraScreen() {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.title}>🎟️ 바코드 인식</h2>
+      <h2 style={styles.title}>바코드 인식</h2>
       <div id="reader" style={styles.reader} />
       <p style={styles.message}>{message}</p>
       <button
@@ -63,15 +63,16 @@ const styles = {
   container: {
     display: 'flex', flexDirection: 'column',
     alignItems: 'center', justifyContent: 'center',
-    height: '100vh', backgroundColor: '#fff8f0', gap: '20px'
+    height: '100vh', backgroundColor: '#ffffff', gap: '24px'
   },
-  title: { fontSize: '36px' },
-  reader: { width: '300px', height: '300px' },
-  message: { fontSize: '20px', color: '#888' },
+  title: { fontSize: '32px', color: '#00754a', fontWeight: 'bold' },
+  reader: { width: '300px', height: '300px', border: '2px solid #d4e9e2', borderRadius: '12px' },
+  message: { fontSize: '18px', color: '#666' },
   cancelBtn: {
-    padding: '12px 30px', fontSize: '18px',
-    borderRadius: '10px', border: 'none',
-    backgroundColor: '#aaa', color: 'white', cursor: 'pointer'
+    padding: '14px 40px', fontSize: '18px',
+    borderRadius: '25px', border: '2px solid #00754a',
+    backgroundColor: '#ffffff', color: '#00754a', cursor: 'pointer',
+    fontWeight: 'bold'
   },
 };
 

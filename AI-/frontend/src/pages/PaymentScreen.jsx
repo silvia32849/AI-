@@ -18,21 +18,24 @@ function PaymentScreen() {
           style={styles.btn}
           onClick={() => navigate('/complete', { state: { item, payType: '카드' } })}
         >
-          💳 카드 결제
+          <div style={styles.btnIcon}>💳</div>
+          <div style={styles.btnText}>카드 결제</div>
         </button>
         <button
           style={styles.btn}
           onClick={() => navigate('/barcode-camera', { state: { item } })}
         >
-          🎟️ 바코드 결제
+          <div style={styles.btnIcon}>🎟️</div>
+          <div style={styles.btnText}>바코드 결제</div>
         </button>
       </div>
 
       <div style={styles.totalBar}>
-        결제 금액: <strong>{(remainingPrice ?? item?.price)?.toLocaleString()}원</strong>
+        <span style={styles.totalLabel}>결제 금액</span>
+        <span style={styles.totalPrice}>{(remainingPrice ?? item?.price)?.toLocaleString()}원</span>
         {remainingPrice && (
           <p style={styles.warningText}>
-            ⚠️ 바코드 차감 후 남은 금액입니다
+            바코드 차감 후 남은 금액입니다
           </p>
         )}
       </div>
@@ -44,21 +47,30 @@ const styles = {
   container: {
     display: 'flex', flexDirection: 'column',
     alignItems: 'center', justifyContent: 'center',
-    height: '100vh', backgroundColor: '#fff8f0', gap: '40px'
+    height: '100vh', backgroundColor: '#ffffff', gap: '40px'
   },
-  title: { fontSize: '36px', marginBottom: '10px' },
-  orderInfo: { fontSize: '20px', color: '#888' },
+  title: { fontSize: '32px', color: '#000000', fontWeight: 'bold' },
+  orderInfo: { fontSize: '18px', color: '#666' },
   btnWrapper: { display: 'flex', gap: '40px' },
   btn: {
-    width: '200px', height: '200px', fontSize: '24px',
-    borderRadius: '20px', border: 'none',
-    backgroundColor: '#6f4e37', color: 'white', cursor: 'pointer'
+    width: '200px', height: '200px',
+    borderRadius: '12px', border: '2px solid #00754a',
+    backgroundColor: '#ffffff', cursor: 'pointer',
+    display: 'flex', flexDirection: 'column',
+    alignItems: 'center', justifyContent: 'center',
+    transition: 'all 0.2s'
   },
+  btnIcon: { fontSize: '60px', marginBottom: '16px' },
+  btnText: { fontSize: '20px', color: '#00754a', fontWeight: 'bold' },
   totalBar: {
-    fontSize: '24px', textAlign: 'center'
+    textAlign: 'center', padding: '20px',
+    backgroundColor: '#d4e9e2', borderRadius: '12px',
+    minWidth: '300px'
   },
+  totalLabel: { fontSize: '18px', color: '#000000', marginRight: '12px' },
+  totalPrice: { fontSize: '28px', color: '#00754a', fontWeight: 'bold' },
   warningText: {
-    color: '#ff4444', fontSize: '18px', marginTop: '8px'
+    color: '#00754a', fontSize: '16px', marginTop: '8px'
   },
 };
 
