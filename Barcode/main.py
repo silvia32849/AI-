@@ -3,64 +3,74 @@ import time
 import discount
 import partner_info
 import receipt
-import scan_product
 import payment_menu
 import calculate_price
 import simple_payment
 
 
-
 # ==========================================
 # 메인 실행
 # ==========================================
-def process_checkout():
+def process_checkout(
+    barcode,
+    original_price,
+    discounted_price=None
+):
 
+    print("바코드:", barcode)
 
     # ----------------------------------
-    # 코드 스캔
+    # 할인 적용 가격 우선 사용
     # ----------------------------------
-    print("\n📷 코드 스캔 중...")
 
-    result = scan_product.scan_code()
+    if discounted_price is not None:
+        original_price = discounted_price
 
-    if result is None:
-        print("코드를 인식하지 못했습니다.")
-        return
+    # ----------------------------------
+    # 코드 종류 판별
+    # ----------------------------------
 
-    barcode = result["data"]
-    code_type = result["type"]
+    if (
+        barcode.startswith("QR")
+        or "PAY" in barcode.upper()
+    ):
+
+        code_type = "QRCode"
+
+    else:
+
+        code_type = "Barcode"
 
     print("코드 종류:", code_type)
     print("데이터:", barcode)
 
     # ----------------------------------
-    # 코드 종류별 처리
-    # ----------------------------------
-
-    if code_type == "QRCode":
-
-        print("QR 처리")
-
-    else:
-
-        print("상품 바코드 처리")
-
-    # ----------------------------------
     # 제휴사 조회
     # ----------------------------------
+
     partner = partner_info.get_partner_info(
         barcode
     )
 
     if partner is None:
-        return
+
+        return {
+            "error": "제휴사 없음"
+        }
 
     # ----------------------------------
     # DB 정보 가져오기
     # ----------------------------------
-    partner_name = partner["partner_name"]
 
-    partner_discount = partner["discount_rate"]
+    partner_name = partner.get(
+        "partner_name",
+        "알 수 없음"
+    )
+
+    partner_discount = partner.get(
+        "discount_rate",
+        0
+    )
 
     is_simple_pay = partner.get(
         "is_simple_pay",
@@ -75,6 +85,7 @@ def process_checkout():
     # ----------------------------------
     # 통신사 할인
     # ----------------------------------
+
     telecom, telecom_discount = (
         discount.process_telecom_discount(
             barcode
@@ -87,7 +98,6 @@ def process_checkout():
     # ----------------------------------
     # 가격 계산
     # ----------------------------------
-    original_price = 20000
 
     (
         p_discount_amt,
@@ -101,9 +111,33 @@ def process_checkout():
         telecom_discount
     )
 
+    print("partner:", p_discount_amt)
+    print("telecom:", t_discount_amt)
+    print("final:", final_price)
+
+    # ----------------------------------
+    # 간편결제 QR이면 바로 결제
+    # ----------------------------------
+
+    if is_simple_pay:
+
+        simple_payment.process_simple_payment(
+            pay_type_name,
+            final_price
+        )
+
+    else:
+
+        payment_menu.payment_menu(
+            is_simple_pay,
+            pay_type_name,
+            final_price
+        )
+
     # ----------------------------------
     # 영수증 출력
     # ----------------------------------
+
     receipt.print_receipt(
 
         partner_name,
@@ -122,28 +156,30 @@ def process_checkout():
     )
 
     # ----------------------------------
-    # 간편결제 QR이면 바로 결제
+    # React 반환
     # ----------------------------------
-    if is_simple_pay:
 
-        simple_payment.process_simple_payment(
-            pay_type_name,
-            final_price
-        )
+    return {
 
-        return
+        "success": True,
 
-    # ----------------------------------
-    # 일반 구매면 결제 선택
-    # ----------------------------------
-    payment_menu.payment_menu(
-        final_price
-    )
+        "barcode": barcode,
 
+        "code_type": code_type,
 
-# ==========================================
-# 프로그램 시작
-# ==========================================
-if __name__ == "__main__":
+        "partner_name": partner_name,
 
-    process_checkout()
+        "payment_type": pay_type_name,
+
+        "partner_discount": p_discount_amt,
+
+        "telecom": telecom,
+
+        "telecom_discount": t_discount_amt,
+
+        "original_price": original_price,
+
+        "final_price": final_price,
+
+        "is_simple_pay": is_simple_pay
+    }

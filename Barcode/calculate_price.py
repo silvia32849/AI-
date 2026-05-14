@@ -1,4 +1,3 @@
-
 # ==========================================
 # 가격 계산
 # ==========================================
@@ -8,9 +7,7 @@ def calculate_price(
     telecom_discount
 ):
 
-    p_discount_amt = int(
-        original_price * (partner_discount / 100)
-    )
+    p_discount_amt = 0
 
     t_discount_amt = int(
         original_price * (telecom_discount / 100)
@@ -18,7 +15,6 @@ def calculate_price(
 
     final_price = (
         original_price
-        - p_discount_amt
         - t_discount_amt
     )
 
@@ -27,4 +23,3 @@ def calculate_price(
         t_discount_amt,
         final_price
     )
-
