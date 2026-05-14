@@ -1,42 +1,41 @@
 import cv2
+import zxingcpp
 
 
-def scan_barcode():
+def scan_code():
 
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-
-    detector = cv2.QRCodeDetector()
 
     while True:
 
         success, frame = cap.read()
 
-        # 카메라 프레임 읽기 실패
-        if not success or frame is None:
-            print("프레임 읽기 실패")
+        if not success:
             continue
 
-        try:
+        # 바코드/QR 인식
+        results = zxingcpp.read_barcodes(frame)
 
-            data, bbox, _ = detector.detectAndDecode(frame)
+        for result in results:
 
-            if data:
-                print("QR 인식 성공!")
-                print("데이터:", data)
+            data = result.text
+            code_type = str(result.format)
 
-                cap.release()
-                cv2.destroyAllWindows()
+            print("인식 성공!")
+            print("종류:", code_type)
+            print("데이터:", data)
 
-                return data
+            cap.release()
+            cv2.destroyAllWindows()
 
-        except Exception as e:
-            print("QR 인식 오류:", e)
+            return {
+                "type": code_type,
+                "data": data
+            }
 
-        cv2.imshow("QR Scanner", frame)
+        cv2.imshow("Scanner", frame)
 
-        key = cv2.waitKey(1)
-
-        if key == 27:
+        if cv2.waitKey(1) == 27:
             break
 
     cap.release()

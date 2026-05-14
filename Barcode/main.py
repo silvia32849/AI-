@@ -9,25 +9,41 @@ import calculate_price
 import simple_payment
 
 
+
 # ==========================================
 # 메인 실행
 # ==========================================
 def process_checkout():
 
+
     # ----------------------------------
-    # QR 스캔
+    # 코드 스캔
     # ----------------------------------
-    print("\n📷 QR 스캔 중...")
+    print("\n📷 코드 스캔 중...")
 
-    barcode = scan_product.scan_barcode()
+    result = scan_product.scan_code()
 
-    if barcode is None:
-
-        print("\n❌ QR 인식 실패")
+    if result is None:
+        print("코드를 인식하지 못했습니다.")
         return
 
-    print("\nQR 인식 성공!")
-    print(f"데이터: {barcode}")
+    barcode = result["data"]
+    code_type = result["type"]
+
+    print("코드 종류:", code_type)
+    print("데이터:", barcode)
+
+    # ----------------------------------
+    # 코드 종류별 처리
+    # ----------------------------------
+
+    if code_type == "QRCode":
+
+        print("QR 처리")
+
+    else:
+
+        print("상품 바코드 처리")
 
     # ----------------------------------
     # 제휴사 조회
