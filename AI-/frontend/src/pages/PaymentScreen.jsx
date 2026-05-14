@@ -3,7 +3,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 function PaymentScreen() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { item, orderType, remainingPrice } = location.state || {};
+  const {
+  item,
+  orderType,
+  remainingPrice,
+  discountedPrice
+} = location.state || {};
 
   return (
     <div style={styles.container}>
@@ -23,7 +28,16 @@ function PaymentScreen() {
         </button>
         <button
           style={styles.btn}
-          onClick={() => navigate('/barcode-camera', { state: { item } })}
+          onClick={() => {
+  console.log("payment discountedPrice:", discountedPrice);
+
+  navigate('/barcode-camera', {
+    state: {
+      item,
+      discountedPrice
+    }
+  });
+}}
         >
           <div style={styles.btnIcon}>🎟️</div>
           <div style={styles.btnText}>바코드 결제</div>
@@ -32,7 +46,7 @@ function PaymentScreen() {
 
       <div style={styles.totalBar}>
         <span style={styles.totalLabel}>결제 금액</span>
-        <span style={styles.totalPrice}>{(remainingPrice ?? item?.price)?.toLocaleString()}원</span>
+        <span style={styles.totalPrice}>{(discountedPrice ?? remainingPrice ?? item?.price)}</span>
         {remainingPrice && (
           <p style={styles.warningText}>
             바코드 차감 후 남은 금액입니다

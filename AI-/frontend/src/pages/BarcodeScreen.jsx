@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 function BarcodeScreen() {
@@ -6,23 +7,56 @@ function BarcodeScreen() {
   const { item, barcodeData } = location.state || {};
 
   const price = item?.price || 0;
-  const remain = barcodeData?.amount || 0;
-  const isEnough = remain >= price;
-  const finalPrice = isEnough ? 0 : price - remain;
 
-  const handleUse = () => {
-    if (!isEnough) {
-      alert(`잔여금액 ${remain.toLocaleString()}원을 결제합니다.\n나머지 ${(price - remain).toLocaleString()}원은 다른 수단으로 결제해주세요.`);
-      navigate('/payment', {
-        state: {
-          item,
-          remainingPrice: price - remain,
-        }
-      });
-      return;
+  const finalPrice = barcodeData?.final_price || 0;
+
+  const isSimplePay = barcodeData?.is_simple_pay;
+
+  const isEnough = isSimplePay
+  ? true
+  : finalPrice === 0;
+
+useEffect(() => {
+
+  if (isSimplePay) {
+
+    navigate('/complete', {
+      state: {
+        item,
+        payType: barcodeData?.partner_name,
+        barcodeData
+      }
+    });
+
+  }
+
+}, [isSimplePay, navigate, item, barcodeData]);
+
+const handleUse = () => {
+
+  if (!isEnough) {
+
+    alert(
+      `최종 결제 금액은 ${finalPrice.toLocaleString()}원입니다.`
+    );
+
+    navigate('/payment', {
+  state: {
+    item,
+    discountedPrice: finalPrice,
+  }
+});
+
+    return;
+  }
+
+  navigate('/payment', {
+    state: {
+      item,
+      discountedPrice: finalPrice,
     }
-    navigate('/complete', { state: { item, payType: barcodeData?.type, finalPrice: 0 } });
-  };
+  });
+};
 
   return (
     <div style={styles.container}>
@@ -38,13 +72,21 @@ function BarcodeScreen() {
           <span style={styles.infoValue}>{barcodeData?.type}</span>
         </div>
         <div style={styles.infoRow}>
-          <span>잔여 금액</span>
-          <span style={styles.infoValue}>{remain.toLocaleString()}원</span>
-        </div>
-        <div style={styles.infoRow}>
-          <span>받을 금액</span>
-          <span style={styles.infoValue}>{price.toLocaleString()}원</span>
-        </div>
+        <span>원가</span>
+
+        <span style={styles.infoValue}>
+          {barcodeData?.original_price?.toLocaleString()}원
+        </span>
+      </div>
+
+      <div style={styles.infoRow}>
+        <span>통신사 할인</span>
+
+        <span style={styles.infoValue}>
+          -{barcodeData?.telecom_discount?.toLocaleString()}원
+        </span>
+      </div>
+
         <div style={{...styles.infoRow, marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #f0f0f0'}}>
           <span style={styles.finalLabel}>결제 금액</span>
           <span style={{

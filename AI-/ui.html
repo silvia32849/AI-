@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>프랜차이즈 키오스크</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+        body { font-family: 'Noto Sans KR', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-200 flex justify-center items-center h-screen">
+
+    <div class="w-[375px] h-[700px] bg-white shadow-2xl rounded-[30px] flex flex-col overflow-hidden relative">
+        
+        <div class="p-5 flex justify-between items-center border-b">
+            <h1 class="text-xl font-black text-orange-900">VIBE COFFEE</h1>
+            <button onclick="alert('도움이 필요하신가요?\n1. 메뉴 선택\n2. 장바구니 확인\n3. 바코드 스캔 순서로 진행하세요!')" 
+                    class="text-2xl hover:scale-110 transition">❓</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 grid grid-cols-2 gap-4 bg-gray-50">
+            <div class="bg-white p-3 rounded-2xl shadow-sm border text-center">
+                <div class="w-full h-24 bg-gray-100 rounded-xl mb-2 flex items-center justify-center text-3xl">☕</div>
+                <p class="font-bold text-sm">아메리카노</p>
+                <p class="text-orange-700 text-xs mb-2">1,500원</p>
+                <button class="w-full bg-orange-900 text-white py-1 rounded-lg text-xs">담기</button>
+            </div>
+            <div class="bg-white p-3 rounded-2xl shadow-sm border text-center">
+                <div class="w-full h-24 bg-gray-100 rounded-xl mb-2 flex items-center justify-center text-3xl">🥤</div>
+                <p class="font-bold text-sm">카페라떼</p>
+                <p class="text-orange-700 text-xs mb-2">2,500원</p>
+                <button class="w-full bg-orange-900 text-white py-1 rounded-lg text-xs">담기</button>
+            </div>
+        </div>
+
+        <div class="p-5 border-t space-y-3 bg-white">
+            <button onclick="openScanner()" 
+                    class="w-full py-4 border-2 border-dashed border-blue-400 text-blue-500 rounded-xl font-bold hover:bg-blue-50 transition">
+                [ 바코드 / 쿠폰 스캔 ]
+            </button>
+            
+            <div class="flex justify-between items-center font-bold">
+                <span>총 주문 금액</span>
+                <span class="text-xl text-red-500">1,500원</span>
+            </div>
+
+            <button class="w-full py-4 bg-orange-900 text-white rounded-2xl text-lg font-bold shadow-lg active:scale-95 transition">
+                결제하기
+            </button>
+        </div>
+
+        <div id="scanner" class="hidden absolute inset-0 bg-black/90 flex flex-col justify-center items-center text-white z-50">
+            <div class="w-64 h-40 border-2 border-blue-400 rounded-lg relative overflow-hidden">
+                <div class="w-full h-0.5 bg-red-500 absolute top-1/2 animate-bounce"></div>
+            </div>
+            <p class="mt-6 font-medium text-center px-10">하단 스캐너에<br>바코드를 인식시켜 주세요</p>
+            <button onclick="applyCoupon()" class="mt-8 bg-blue-500 px-6 py-2 rounded-full font-bold">쿠폰 적용 테스트</button>
+            <button onclick="closeScanner()" class="mt-4 text-gray-400 underline">닫기</button>
+        </div>
+    </div>
+
+    <script>
+        function openScanner() { document.getElementById('scanner').classList.remove('hidden'); }
+        function closeScanner() { document.getElementById('scanner').classList.add('hidden'); }
+        function applyCoupon() {
+            alert('쿠폰이 적용되었습니다! (-1,000원)');
+            closeScanner();
+        }
+    </script>
+</body>
+</html>

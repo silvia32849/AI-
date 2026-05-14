@@ -12,19 +12,19 @@ import simple_payment
 # ==========================================
 # 메인 실행
 # ==========================================
-def process_checkout():
+# ==========================================
+# 메인 실행
+# ==========================================
+def process_checkout(barcode, original_price, discounted_price=None):
+
+    if discounted_price:
+        original_price = discounted_price
+
+    print("바코드:", barcode)
 
     # ----------------------------------
     # QR 스캔
     # ----------------------------------
-    print("\n📷 QR 스캔 중...")
-
-    barcode = scan_product.scan_barcode()
-
-    if barcode is None:
-
-        print("\n❌ QR 인식 실패")
-        return
 
     print("\nQR 인식 성공!")
     print(f"데이터: {barcode}")
@@ -32,19 +32,24 @@ def process_checkout():
     # ----------------------------------
     # 제휴사 조회
     # ----------------------------------
+
     partner = partner_info.get_partner_info(
         barcode
     )
 
     if partner is None:
-        return
+        return {
+            "error": "제휴사 없음"
+        }
 
     # ----------------------------------
     # DB 정보 가져오기
     # ----------------------------------
+
     partner_name = partner["partner_name"]
 
     partner_discount = partner["discount_rate"]
+    partner_discount = 0
 
     is_simple_pay = partner.get(
         "is_simple_pay",
@@ -59,6 +64,7 @@ def process_checkout():
     # ----------------------------------
     # 통신사 할인
     # ----------------------------------
+
     telecom, telecom_discount = (
         discount.process_telecom_discount(
             barcode
@@ -68,11 +74,14 @@ def process_checkout():
     print("\n🔍 데이터 확인 중...\n")
     time.sleep(1)
 
+    
     # ----------------------------------
     # 가격 계산
     # ----------------------------------
-    original_price = 20000
 
+   
+
+    
     (
         p_discount_amt,
         t_discount_amt,
@@ -84,10 +93,13 @@ def process_checkout():
         partner_discount,
         telecom_discount
     )
-
+    print("partner:", p_discount_amt)
+    print("telecom:", t_discount_amt)
+    print("final:", final_price)
     # ----------------------------------
     # 영수증 출력
     # ----------------------------------
+
     receipt.print_receipt(
 
         partner_name,
@@ -108,6 +120,7 @@ def process_checkout():
     # ----------------------------------
     # 간편결제 QR이면 바로 결제
     # ----------------------------------
+
     if is_simple_pay:
 
         simple_payment.process_simple_payment(
@@ -115,19 +128,17 @@ def process_checkout():
             final_price
         )
 
-        return
-
     # ----------------------------------
-    # 일반 구매면 결제 선택
+    # React로 데이터 반환
     # ----------------------------------
-    payment_menu.payment_menu(
-        final_price
-    )
 
-
-# ==========================================
-# 프로그램 시작
-# ==========================================
-if __name__ == "__main__":
-
-    process_checkout()
+    return {
+        "barcode": barcode,
+        "partner_name": partner_name,
+        "telecom_discount": t_discount_amt,
+        "final_price": final_price,
+        "original_price": original_price,
+        "telecom": telecom,
+        "payment_type": pay_type_name,
+        "is_simple_pay": is_simple_pay,
+    }

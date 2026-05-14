@@ -2,16 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Html5Qrcode } from 'html5-qrcode';
 
-const fakeBarcodes = [
-  { type: "카카오페이", code: "1234-5678-9012", amount: 10000 },
-  { type: "네이버페이", code: "9876-5432-1098", amount: 15000 },
-  { type: "쿠폰", code: "5555-6666-7777", amount: 5000 },
-];
+
 
 function BarcodeCameraScreen() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { item } = location.state || {};
+  const { item, discountedPrice } = location.state || {};
+  console.log("discountedPrice:", discountedPrice);
   const [message, setMessage] = useState('바코드를 카메라에 비춰주세요');
   const html5QrCodeRef = useRef(null);
   const isStarted = useRef(false);
@@ -26,12 +23,39 @@ function BarcodeCameraScreen() {
     html5QrCode.start(
       { facingMode: "user" },
       { fps: 10, qrbox: { width: 250, height: 250 } },
-      function(decodedText) {
-        isStarted.current = false;
-        html5QrCode.stop().catch(function() {});
-        const fake = fakeBarcodes[Math.floor(Math.random() * fakeBarcodes.length)];
-        navigate('/barcode', { state: { item, barcodeData: fake } });
-      },
+        function(decodedText) {
+      isStarted.current = false;
+
+      html5QrCode.stop().catch(function() {});
+
+      fetch("http://192.168.0.12:5000/process", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+  barcode: decodedText,
+  originalPrice: item?.price,
+  discountedPrice
+}),
+      
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+
+        navigate('/barcode', {
+          state: {
+            item,
+            barcodeData: data
+          }
+        });
+      })
+      .catch(error => {
+        console.error(error);
+        setMessage("서버 연결 실패");
+      });
+    },
       function() {}
     ).catch(function() {
       setMessage('카메라를 찾을 수 없어요. 카메라 권한을 허용해주세요.');
@@ -42,7 +66,7 @@ function BarcodeCameraScreen() {
         html5QrCodeRef.current.stop().catch(function() {});
       }
     };
-  }, []);
+   }, [item, navigate]);
 
   return (
     <div style={styles.container}>
