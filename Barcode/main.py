@@ -181,5 +181,10 @@ def process_checkout(
 
         "final_price": final_price,
 
-        "is_simple_pay": is_simple_pay
+        "is_simple_pay": is_simple_pay,
+
+        "originalPrice": original_price,
+
+        "discountedPrice": final_price
+    
     }

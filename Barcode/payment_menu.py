@@ -1,7 +1,6 @@
 import simple_payment
 import scan_product
 
-
 # ==========================================
 # 간편결제 종류 판별
 # ==========================================
@@ -23,7 +22,7 @@ def detect_payment_type(barcode):
 # ==========================================
 # 결제 메뉴
 # ==========================================
-def payment_menu(final_price):
+def payment_menu(is_simple_pay, pay_type_name, final_price):
 
     while True:
 
