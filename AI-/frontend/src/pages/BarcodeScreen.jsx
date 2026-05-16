@@ -36,9 +36,6 @@ const handleUse = () => {
 
   if (!isEnough) {
 
-    alert(
-      `최종 결제 금액은 ${finalPrice.toLocaleString()}원입니다.`
-    );
 
     navigate('/payment', {
   state: {
@@ -96,7 +93,7 @@ const handleUse = () => {
         </div>
         {!isEnough && (
           <p style={styles.warningText}>
-            잔여금액이 부족합니다
+            결제를 진행해주세요.
           </p>
         )}
       </div>
@@ -115,7 +112,7 @@ const handleUse = () => {
           }}
           onClick={handleUse}
         >
-          {isEnough ? '사용' : '다른 결제수단'}
+          {isEnough ? '사용' : '결제수단 선택'}
         </button>
       </div>
     </div>

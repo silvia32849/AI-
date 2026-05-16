@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useState } from 'react';
 
 function PaymentScreen() {
   const navigate = useNavigate();
@@ -9,8 +10,29 @@ function PaymentScreen() {
   remainingPrice,
   discountedPrice
 } = location.state || {};
-
+  const [showFAQ, setShowFAQ] = useState(false);
+ 
   return (
+  <>
+    {/* 상단 헤더 */}
+    <div style={styles.header}>
+      <button
+        style={styles.homeBtn}
+        onClick={() => navigate('/')}
+      >
+        Home
+      </button>
+
+      <h2 style={styles.logo}>EASY CAFE</h2>
+
+      <button
+        style={styles.faqBtn}
+        onClick={() => setShowFAQ(true)}
+      >
+        FAQ
+      </button>
+    </div>
+
     <div style={styles.container}>
       <h2 style={styles.title}>결제 수단 선택</h2>
 
@@ -21,23 +43,31 @@ function PaymentScreen() {
       <div style={styles.btnWrapper}>
         <button
           style={styles.btn}
-          onClick={() => navigate('/complete', { state: { item, payType: '카드' } })}
+          onClick={() =>
+            navigate('/complete', {
+              state: { item, payType: '카드' }
+            })
+          }
         >
           <div style={styles.btnIcon}>💳</div>
           <div style={styles.btnText}>카드 결제</div>
         </button>
+
         <button
           style={styles.btn}
           onClick={() => {
-  console.log("payment discountedPrice:", discountedPrice);
+            console.log(
+              "payment discountedPrice:",
+              discountedPrice
+            );
 
-  navigate('/barcode-camera', {
-    state: {
-      item,
-      discountedPrice
-    }
-  });
-}}
+            navigate('/barcode-camera', {
+              state: {
+                item,
+                discountedPrice
+              }
+            });
+          }}
         >
           <div style={styles.btnIcon}>🎟️</div>
           <div style={styles.btnText}>바코드 결제</div>
@@ -46,7 +76,13 @@ function PaymentScreen() {
 
       <div style={styles.totalBar}>
         <span style={styles.totalLabel}>결제 금액</span>
-        <span style={styles.totalPrice}>{(discountedPrice ?? remainingPrice ?? item?.price)}</span>
+
+        <span style={styles.totalPrice}>
+          {discountedPrice ??
+            remainingPrice ??
+            item?.price}
+        </span>
+
         {remainingPrice && (
           <p style={styles.warningText}>
             바코드 차감 후 남은 금액입니다
@@ -54,10 +90,47 @@ function PaymentScreen() {
         )}
       </div>
     </div>
+   </>
   );
 }
 
+
 const styles = {
+  header: {
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '20px 40px',
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  boxSizing: 'border-box'
+},
+
+homeBtn: {
+  padding: '10px 24px',
+  borderRadius: '20px',
+  border: '2px solid #00754a',
+  backgroundColor: '#ffffff',
+  color: '#00754a',
+  fontWeight: 'bold',
+  cursor: 'pointer'
+},
+
+faqBtn: {
+    padding: '12px 24px', fontSize: '16px',
+    borderRadius: '25px', border: '2px solid #00754a',
+    backgroundColor: '#ffffff', color: '#00754a',
+    cursor: 'pointer', fontWeight: 'bold',
+    transition: 'all 0.2s'
+  },
+
+logo: {
+  fontSize: '28px',
+  color: '#00754a',
+  fontWeight: 'bold'
+},
   container: {
     display: 'flex', flexDirection: 'column',
     alignItems: 'center', justifyContent: 'center',

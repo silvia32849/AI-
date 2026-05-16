@@ -115,24 +115,7 @@ def process_checkout(
     print("telecom:", t_discount_amt)
     print("final:", final_price)
 
-    # ----------------------------------
-    # 간편결제 QR이면 바로 결제
-    # ----------------------------------
-
-    if is_simple_pay:
-
-        simple_payment.process_simple_payment(
-            pay_type_name,
-            final_price
-        )
-
-    else:
-
-        payment_menu.payment_menu(
-            is_simple_pay,
-            pay_type_name,
-            final_price
-        )
+ 
 
     # ----------------------------------
     # 영수증 출력

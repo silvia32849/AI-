@@ -21,26 +21,10 @@ function CompleteScreen() {
           <span style={styles.infoValue}>{payType}</span>
         </div>
         <div style={{...styles.infoRow, marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #f0f0f0'}}>
-          <div style={styles.infoRow}>
-          <span>원가</span>
-          <span style={styles.infoValue}>
-            {barcodeData?.original_price?.toLocaleString()}원
-          </span>
-        </div>
+        
 
-        <div style={styles.infoRow}>
-          <span>통신사 할인</span>
-          <span style={styles.infoValue}>
-            -{barcodeData?.telecom_discount?.toLocaleString()}원
-          </span>
-        </div>
-
-        <div style={styles.infoRow}>
-          <span>{barcodeData?.telecom} 할인</span>
-          <span style={styles.infoValue}>
-            -{barcodeData?.telecom_discount?.toLocaleString()}원
-          </span>
-        </div>
+      
+        
           <span style={styles.totalLabel}>결제 금액</span>
           <span style={styles.totalPrice}>{(barcodeData?.final_price ?? item?.price)?.toLocaleString()}원</span>
         </div>
