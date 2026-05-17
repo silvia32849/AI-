@@ -31,7 +31,7 @@ function MenuScreen() {
   return (
     <div style={styles.container} onClick={handleUserAction}>
 
-      {/* 상단 헤더 */}
+      
       <div style={styles.header}>
         <button
           style={styles.homeBtn}
@@ -48,7 +48,7 @@ function MenuScreen() {
         </button>
       </div>
 
-      {/* 카테고리 탭 */}
+      
       <div style={styles.tabs}>
         {categories.map((cat) => (
           <button
@@ -65,7 +65,7 @@ function MenuScreen() {
         ))}
       </div>
 
-      {/* 메뉴 그리드 */}
+      
       <div style={styles.grid}>
         {menuData[selectedCategory].map((item) => (
           <div
@@ -77,14 +77,14 @@ function MenuScreen() {
             }}
             onClick={() => setSelectedItem(item)}
           >
-            <div style={styles.emoji}>{item.emoji}</div>
+            <img src={item.image} alt={item.name} style={styles.itemImage} />
             <div style={styles.itemName}>{item.name}</div>
             <div style={styles.itemPrice}>{item.price.toLocaleString()}원</div>
           </div>
         ))}
       </div>
 
-      {/* 하단 선택 바 */}
+      
       <div style={styles.bottomBar}>
         <span style={styles.selectedText}>
           {selectedItem
@@ -96,7 +96,7 @@ function MenuScreen() {
         </button>
       </div>
 
-      {/* FAQ 팝업 */}
+      
       {showFAQ && (
         <div style={styles.faqOverlay}>
           <div style={styles.faqModal} onClick={(e) => e.stopPropagation()}>
@@ -157,20 +157,35 @@ const styles = {
   grid: {
     display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
     gap: '24px', padding: '24px 40px', flex: 1,
-    overflowY: 'auto', backgroundColor: '#fafafa'
+    overflowY: 'auto', backgroundColor: '#fafafa',
+    alignContent: 'start'
   },
   card: {
     backgroundColor: '#ffffff', borderRadius: '12px',
-    padding: '24px', textAlign: 'center', cursor: 'pointer',
-    transition: 'all 0.2s'
+    padding: '16px', textAlign: 'center', cursor: 'pointer',
+    transition: 'all 0.2s',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    height: 'auto',
+    boxSizing: 'border-box'
   },
-  emoji: { fontSize: '52px', marginBottom: '12px' },
+  itemImage: {
+    width: '100%',
+    height: 'auto',
+    maxHeight: '220px',
+    objectFit: 'contain',
+    borderRadius: '8px',
+    marginBottom: '12px',
+    backgroundColor: '#ffffff'
+  },
   itemName: { 
-    fontSize: '19px', fontWeight: 'bold', 
-    marginBottom: '8px', color: '#000000' 
+    fontSize: '18px', fontWeight: 'bold', 
+    marginBottom: '8px', color: '#000000',
+    wordBreak: 'keep-all'
   },
   itemPrice: { 
-    fontSize: '17px', color: '#00754a', fontWeight: 'bold' 
+    fontSize: '16px', color: '#00754a', fontWeight: 'bold' 
   },
   bottomBar: {
     display: 'flex', justifyContent: 'space-between',
