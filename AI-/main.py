@@ -60,7 +60,10 @@ def index():
             .category-group > summary { padding: 15px; background: #3498db; color: white; font-size: 17px; font-weight: bold; cursor: pointer; list-style: none; }
             .question-item { border-top: 1px solid #eee; background: #fff; }
             .question-item summary { padding: 12px; font-size: 14px; font-weight: bold; color: #333; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+            
+            /* [디자인 수정] 아래 리스트 구역에서도 이미지가 있으면 깔끔하게 보이도록 조절 */
             .answer { padding: 12px 15px; background: #fafafa; color: #666; font-size: 13px; line-height: 1.6; border-top: 1px dashed #eee; }
+            .answer-img { max-width: 100%; height: auto; margin-top: 10px; border-radius: 8px; display: block; border: 1px solid #eee; }
             
             .hot-badge { background: #e67e22; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 8px; font-weight: bold; }
 
@@ -74,6 +77,10 @@ def index():
             }
             .modal-header { font-size: 16px; font-weight: bold; color: #e67e22; margin-bottom: 15px; text-align: left; }
             .modal-body { font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 20px; text-align: left; background: #fafafa; padding: 15px; border-radius: 12px; border: 1px solid #eee; }
+            
+            /* 💡 [추가] 모달창 안의 이미지 디자인 설정 */
+            .modal-img { max-width: 100%; height: auto; margin-top: 10px; border-radius: 10px; border: 1px solid #ddd; display: none; }
+            
             .modal-close-btn { background: #3498db; color: white; border: none; padding: 10px 30px; font-size: 14px; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.2s; width: 100%; }
             .modal-close-btn:hover { background: #2980b9; }
 
@@ -92,7 +99,7 @@ def index():
                     <div class="top3-title">🔥 실시간 인기 질문</div>
                     <div id="top3-container" class="top3-card-container">
                         {% for item in top_3 %}
-                        <div class="top3-card" id="top3-card-{{ item.id }}" onclick="openModal({{ item.question|tojson|safe }}, {{ item.answer|tojson|safe }}, '{{ item.id }}')" data-faq-id="{{ item.id }}">
+                        <div class="top3-card" id="top3-card-{{ item.id }}" onclick="openModal({{ item.question|tojson|safe }}, {{ item.answer|tojson|safe }}, '{{ item.id }}', {{ item.image_url|tojson|safe }})" data-faq-id="{{ item.id }}">
                             <span class="top3-rank">TOP {{ loop.index }}</span>
                             <span class="top3-text">{{ item.question }}</span>
                         </div>
@@ -107,7 +114,7 @@ def index():
                 <details class="category-group" data-category-group="{{ category }}">
                     <summary>{{ category }}</summary>
                     {% for item in items %}
-                    <details class="question-item" id="faq-item-{{ item.id }}" data-faq-id="{{ item.id }}" data-question-text="{{ item.question }}" data-answer-text="{{ item.answer }}" ontoggle="if(this.open) triggerClick('{{ item.id }}')">
+                    <details class="question-item" id="faq-item-{{ item.id }}" data-faq-id="{{ item.id }}" data-question-text="{{ item.question }}" data-answer-text="{{ item.answer }}" data-image-url="{{ item.image_url if item.image_url else '' }}" ontoggle="if(this.open) triggerClick('{{ item.id }}')">
                         <summary>
                             <span class="q-text">{{ item.question }}</span>
                             <span class="badge-container">
@@ -118,6 +125,11 @@ def index():
                         </summary>
                         <div class="answer">
                             {{ item.answer }}
+                            
+                            {% if item.image_url %}
+                            <img src="{{ item.image_url }}" class="answer-img" alt="도움말 이미지">
+                            {% endif %}
+                            
                             <div style="font-size: 11px; color: #ccc; margin-top: 8px;">
                                 조회수: <span id="count-{{ item.id }}" class="click-number">{{ item.click_count }}</span>
                             </div>
@@ -134,6 +146,10 @@ def index():
             <div class="modal-content">
                 <div id="modal-title" class="modal-header">💡 질문 내용</div>
                 <div id="modal-body" class="modal-body">답변 내용</div>
+                
+                <img id="modal-image" class="modal-img" src="" alt="도움말 이미지">
+                <div style="margin-bottom: 20px;"></div>
+                
                 <button class="modal-close-btn" onclick="closeModal()">확인</button>
             </div>
         </div>
@@ -200,10 +216,11 @@ def index():
                     const id = item.getAttribute('data-faq-id');
                     const question = item.getAttribute('data-question-text');
                     const answer = item.getAttribute('data-answer-text');
+                    const imageUrl = item.getAttribute('data-image-url') || '';
                     const countEl = document.getElementById('count-' + id);
                     const count = countEl ? (parseInt(countEl.textContent.trim(), 10) || 0) : 0;
                     
-                    faqList.push({ id, question, answer, count });
+                    faqList.push({ id, question, answer, imageUrl, count });
                 });
 
                 faqList.sort((a, b) => b.count - a.count);
@@ -215,9 +232,11 @@ def index():
                 top3Data.forEach((item, index) => {
                     const safeQuestion = item.question.replace(/'/g, "\\'");
                     const safeAnswer = item.answer.replace(/'/g, "\\'");
+                    const safeImageUrl = item.imageUrl.replace(/'/g, "\\'");
 
+                    // 💡 [수정] 카드가 재생성될 때도 openModal 함수에 이미지 URL 주소를 안전하게 넘겨주도록 처리
                     const cardHtml = `
-                        <div class="top3-card" id="top3-card-${item.id}" onclick="openModal('${safeQuestion}', '${safeAnswer}', '${item.id}')" data-faq-id="${item.id}">
+                        <div class="top3-card" id="top3-card-${item.id}" onclick="openModal('${safeQuestion}', '${safeAnswer}', '${item.id}', '${safeImageUrl}')" data-faq-id="${item.id}">
                             <span class="top3-rank">TOP ${index + 1}</span>
                             <span class="top3-text">${item.question}</span>
                         </div>
@@ -226,9 +245,21 @@ def index():
                 });
             }
 
-            function openModal(question, answer, id) {
+            // 💡 [수정] 이미지 URL 인자(imgUrl)를 추가로 받아서 처리합니다.
+            function openModal(question, answer, id, imgUrl) {
                 document.getElementById('modal-title').innerText = "💡 " + question;
                 document.getElementById('modal-body').innerText = answer;
+                
+                const modalImg = document.getElementById('modal-image');
+                // 이미지 URL이 실제로 존재하면 <img> 태그를 보여주고 주소를 매핑합니다.
+                if (imgUrl && imgUrl.trim() !== "" && imgUrl !== "NULL") {
+                    modalImg.src = imgUrl;
+                    modalImg.style.display = "block";
+                } else {
+                    modalImg.src = "";
+                    modalImg.style.display = "none";
+                }
+                
                 document.getElementById('custom-modal').style.display = 'flex';
                 triggerClick(id);
             }
@@ -244,7 +275,6 @@ def index():
     final_data = {cat: grouped_faqs[cat] for cat in category_order if cat in grouped_faqs}
     return render_template_string(html_template, final_data=final_data, top_3=top_3_faqs)
 
-# 💡 [버그 수정 완료] 오타 구역을 제거하고 무조건 'click_count'로만 수집 및 반영하도록 고쳤습니다.
 @app.route('/update_click', methods=['POST'])
 def update_click():
     data = request.json
