@@ -27,7 +27,7 @@ def index():
             grouped_faqs[cat] = []
         grouped_faqs[cat].append(item)
 
-    # 5. 각 카테고리 내부 정렬 및 1등 질문 표시 (처음 로딩용)
+    # 5. 각 카테고리 내부 정렬 및 1등 질문 표시
     for cat in grouped_faqs:
         if grouped_faqs[cat]:
             grouped_faqs[cat].sort(key=lambda x: x.get('click_count', 0), reverse=True)
@@ -59,7 +59,6 @@ def index():
             .category-group { margin-bottom: 15px; border: 2px solid #3498db; border-radius: 12px; overflow: hidden; }
             .category-group > summary { padding: 15px; background: #3498db; color: white; font-size: 17px; font-weight: bold; cursor: pointer; list-style: none; }
             .question-item { border-top: 1px solid #eee; background: #fff; }
-            /* [수정] 자바스크립트 제어를 위해 각 카테고리 박스에 data-category 속성을 추적할 수 있도록 함 */
             .question-item summary { padding: 12px; font-size: 14px; font-weight: bold; color: #333; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
             .answer { padding: 12px 15px; background: #fafafa; color: #666; font-size: 13px; line-height: 1.6; border-top: 1px dashed #eee; }
             
@@ -93,7 +92,7 @@ def index():
                     <div class="top3-title">🔥 실시간 인기 질문</div>
                     <div class="top3-card-container">
                         {% for item in top_3 %}
-                        <div class="top3-card" onclick="openModal('{{ item.question }}', '{{ item.answer }}', '{{ item.id }}')">
+                        <div class="top3-card" onclick='openModal({{ item.question|tojson|safe }}, {{ item.answer|tojson|safe }}, "{{ item.id }}")'>
                             <span class="top3-rank">TOP {{ loop.index }}</span>
                             {{ item.question }}
                         </div>
@@ -152,7 +151,6 @@ def index():
                         let target = document.getElementById('count-' + id);
                         if (target) {
                             target.textContent = data.new_count;
-                            // 💡 숫자가 바뀌었으니 실시간으로 카테고리 1등을 다시 계산하는 함수를 실행합니다!
                             updateCategoryBadges();
                         }
                     }
@@ -160,16 +158,13 @@ def index():
                 .catch(err => console.error("조회수 업데이트 실패:", err));
             }
 
-            // 🏆 실시간으로 각 카테고리별 조회수 1등을 찾아 뱃지를 새로 달아주는 함수
             function updateCategoryBadges() {
                 const groups = document.querySelectorAll('.category-group');
-                
                 groups.forEach(group => {
                     const items = group.querySelectorAll('.question-item');
                     let maxCount = -1;
                     let topItem = null;
 
-                    // 1. 해당 카테고리 안에서 조회수가 가장 높은 질문 찾기
                     items.forEach(item => {
                         const id = item.getAttribute('data-faq-id');
                         const countEl = document.getElementById('count-' + id);
@@ -182,13 +177,11 @@ def index():
                         }
                     });
 
-                    // 2. 기존에 붙어있던 '인기 1위' 뱃지 전부 떼기
                     items.forEach(item => {
                         const badgeContainer = item.querySelector('.badge-container');
                         if (badgeContainer) badgeContainer.innerHTML = '';
                     });
 
-                    // 3. 실시간 1등으로 뽑힌 질문에만 새 뱃지 달아주기
                     if (topItem && maxCount > 0) {
                         const badgeContainer = topItem.querySelector('.badge-container');
                         if (badgeContainer) {
