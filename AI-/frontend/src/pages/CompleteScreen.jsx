@@ -4,6 +4,7 @@ function CompleteScreen() {
   const navigate = useNavigate();
   const location = useLocation();
   const { item, payType, barcodeData } = location.state || {};
+  const finalPrice = barcodeData?.final_price || 0;
 
   console.log(location.state);
 
@@ -26,7 +27,18 @@ function CompleteScreen() {
       
         
           <span style={styles.totalLabel}>결제 금액</span>
-          <span style={styles.totalPrice}>{(barcodeData?.final_price ?? item?.price)?.toLocaleString()}원</span>
+ <span
+  style={{
+    ...styles.finalPrice,
+    color: '#00754a'
+  }}
+>
+  {(barcodeData?.partner_name === "네이버페이" ||
+    barcodeData?.partner_name === "카카오페이" ||
+    barcodeData?.partner_name === "페이코")
+      ? `${barcodeData?.display_price?.toLocaleString()}원`
+      : `${finalPrice.toLocaleString()}원`}
+</span>
         </div>
       </div>
       <div style={styles.btnWrapper}>

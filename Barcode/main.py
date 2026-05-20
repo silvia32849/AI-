@@ -72,10 +72,11 @@ def process_checkout(
         0
     )
 
-    is_simple_pay = partner.get(
-        "is_simple_pay",
-        False
-    )
+    is_simple_pay = partner_name in [
+    "카카오톡 선물하기",
+    "네이버페이",
+    "카카오페이"
+]
 
     pay_type_name = partner.get(
         "payment_type",
@@ -102,6 +103,7 @@ def process_checkout(
     (
         p_discount_amt,
         t_discount_amt,
+        total_price,
         final_price
 
     ) = calculate_price.calculate_price(
@@ -109,12 +111,15 @@ def process_checkout(
         original_price,
         partner_name,
         partner_discount,
-        telecom_discount
+        telecom_discount,
+    
     )
 
     print("partner:", p_discount_amt)
     print("telecom:", t_discount_amt)
     print("final:", final_price)
+    print("DEBUG total_price =", total_price)
+    print("DEBUG telecom_discount =", telecom_discount)
 
  
 
@@ -165,10 +170,13 @@ def process_checkout(
 
         "final_price": final_price,
 
+        "display_price": total_price,
+
         "is_simple_pay": is_simple_pay,
 
         "originalPrice": original_price,
 
-        "discountedPrice": final_price
-    
+        "discountedPrice": final_price,
+
+        "display_price": total_price
     }

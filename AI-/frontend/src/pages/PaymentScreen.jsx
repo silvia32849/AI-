@@ -8,7 +8,8 @@ function PaymentScreen() {
   item,
   orderType,
   remainingPrice,
-  discountedPrice
+  discountedPrice,
+  barcodeData
 } = location.state || {};
   const [showFAQ, setShowFAQ] = useState(false);
  
@@ -41,17 +42,21 @@ function PaymentScreen() {
       </div>
 
       <div style={styles.btnWrapper}>
-        <button
-          style={styles.btn}
-          onClick={() =>
-            navigate('/complete', {
-              state: { item, payType: '카드' }
-            })
-          }
-        >
-          <div style={styles.btnIcon}>💳</div>
-          <div style={styles.btnText}>카드 결제</div>
-        </button>
+      <button
+  style={styles.btn}
+  onClick={() =>
+    navigate('/complete', {
+      state: {
+        item,
+        payType: '카드',
+        barcodeData
+      }
+    })
+  }
+>
+  <div style={styles.btnIcon}>💳</div>
+  <div style={styles.btnText}>카드 결제</div>
+</button>
 
         <button
           style={styles.btn}
@@ -64,7 +69,8 @@ function PaymentScreen() {
             navigate('/barcode-camera', {
               state: {
                 item,
-                discountedPrice
+                discountedPrice: remainingPrice,
+                barcodeData
               }
             });
           }}
@@ -78,10 +84,8 @@ function PaymentScreen() {
         <span style={styles.totalLabel}>결제 금액</span>
 
         <span style={styles.totalPrice}>
-          {discountedPrice ??
-            remainingPrice ??
-            item?.price}
-        </span>
+  {remainingPrice || item?.price}
+</span>
 
         {remainingPrice && (
           <p style={styles.warningText}>

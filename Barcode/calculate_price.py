@@ -32,14 +32,28 @@ def calculate_price(
     # 간편결제 잔액 조회
     balance = get_pay_balance(partner_name)
 
-    # 잔액 차감
-    if balance >= total_price:
+  
+# 즉시 결제 완료 타입
+    if partner_name in [
+        "네이버페이",
+        "카카오페이",
+        "페이코"
+    ]:
         final_price = 0
+
+    # 카카오톡 선물하기 등
     else:
-        final_price = total_price - balance
+
+        balance = get_pay_balance(partner_name)
+
+        if balance >= total_price:
+            final_price = 0
+        else:
+            final_price = total_price - balance
 
     return (
         p_discount_amt,
         t_discount_amt,
+        total_price,
         final_price
     )

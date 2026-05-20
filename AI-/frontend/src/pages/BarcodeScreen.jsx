@@ -38,17 +38,18 @@ useEffect(() => {
 const handleUse = () => {
 
   // 잔액 부족 → 추가 결제
-  if (!isEnough) {
+ if (!isEnough) {
 
-    navigate('/payment', {
-      state: {
-        item,
-        discountedPrice: finalPrice,
-      }
-    });
+  navigate('/payment', {
+    state: {
+      item,
+      remainingPrice: finalPrice,
+      barcodeData
+    }
+  });
 
-    return;
-  }
+  return;
+}
 
   // 잔액 충분 → 바로 완료
   navigate('/complete', {
@@ -106,10 +107,13 @@ const handleUse = () => {
     )}
         <div style={{...styles.infoRow, marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #f0f0f0'}}>
           <span style={styles.finalLabel}>결제 금액</span>
-          <span style={{
-            ...styles.finalPrice,
-            color: isEnough ? '#00754a' : '#d32f2f'
-          }}>{finalPrice.toLocaleString()}원</span>
+          <span style={styles.finalPrice}>
+  {barcodeData?.partner_name === "네이버페이" ||
+   barcodeData?.partner_name === "카카오페이" ||
+   barcodeData?.partner_name === "페이코"
+    ? `${barcodeData?.original_price?.toLocaleString()}원`
+    : `${finalPrice.toLocaleString()}원`}
+</span>
         </div>
         {!isEnough && (
           <p style={styles.warningText}>
