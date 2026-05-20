@@ -40,49 +40,57 @@ def index():
         <meta charset="UTF-8">
         <title>키오스크 도움말 센터</title>
         <style>
-            body { font-family: 'Malgun Gothic', sans-serif; display: flex; justify-content: center; background-color: #f4f4f4; padding: 50px 0; }
+            /* 전체 배경 및 기본 텍스트 블랙(#000000) 세팅 */
+            body { font-family: 'Malgun Gothic', sans-serif; display: flex; justify-content: center; background-color: #f8f9fa; padding: 50px 0; color: #000000; }
             .faq-container { width: 480px; }
-            .faq-box { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+            
+            /* 메인 박스는 순백색(#FFFFFF) */
+            .faq-box { background: #FFFFFF; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
             
             .top3-section { margin-bottom: 25px; }
-            .top3-title { font-size: 16px; font-weight: bold; color: #e67e22; margin-bottom: 10px; display: flex; align-items: center; }
+            /* 인기 질문 타이틀은 선배님의 딥그린(#00754a) */
+            .top3-title { font-size: 16px; font-weight: bold; color: #00754a; margin-bottom: 12px; display: flex; align-items: center; }
             .top3-card-container { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
             
+            /* TOP 3 카드는 연한 민트그린(#d4e9e2) 배경으로 은은하고 세련되게! */
             .top3-card { 
-                min-width: 130px; max-width: 140px; background: #fff8ed; border: 1px solid #ffeaa7; padding: 12px; 
+                min-width: 130px; max-width: 140px; background: #d4e9e2; border: 1px solid #b2dfdb; padding: 12px; 
                 border-radius: 12px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s ease;
-                word-break: break-all; white-space: normal; line-height: 1.4;
+                color: #000000; word-break: break-all; white-space: normal; line-height: 1.4;
             }
-            .top3-card:hover { transform: translateY(-3px); box-shadow: 0 5px 10px rgba(0,0,0,0.05); }
-            .top3-rank { color: #e67e22; font-size: 11px; margin-bottom: 4px; display: block; }
+            .top3-card:hover { transform: translateY(-3px); box-shadow: 0 5px 12px rgba(0,117,74,0.15); }
+            .top3-rank { color: #00754a; font-size: 11px; margin-bottom: 4px; display: block; }
 
-            .category-group { margin-bottom: 15px; border: 2px solid #3498db; border-radius: 12px; overflow: hidden; }
-            .category-group > summary { padding: 15px; background: #3498db; color: white; font-size: 17px; font-weight: bold; cursor: pointer; list-style: none; }
-            .question-item { border-top: 1px solid #eee; background: #fff; }
-            .question-item summary { padding: 12px; font-size: 14px; font-weight: bold; color: #333; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+            /* 카테고리 그룹 테두리와 타이틀 바를 선배님의 메인 딥그린(#00754a)으로 깔끔하게 매칭 */
+            .category-group { margin-bottom: 15px; border: 2px solid #00754a; border-radius: 12px; overflow: hidden; background: #FFFFFF; }
+            .category-group > summary { padding: 15px; background: #00754a; color: #FFFFFF; font-size: 17px; font-weight: bold; cursor: pointer; list-style: none; }
             
-            /* [디자인 수정] 아래 리스트 구역에서도 이미지가 있으면 깔끔하게 보이도록 조절 */
-            .answer { padding: 12px 15px; background: #fafafa; color: #666; font-size: 13px; line-height: 1.6; border-top: 1px dashed #eee; }
-            .answer-img { max-width: 100%; height: auto; margin-top: 10px; border-radius: 8px; display: block; border: 1px solid #eee; }
+            .question-item { border-top: 1px solid #eef2f0; background: #FFFFFF; }
+            .question-item summary { padding: 12px; font-size: 14px; font-weight: bold; color: #000000; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
             
-            .hot-badge { background: #e67e22; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 8px; font-weight: bold; }
+            .answer { padding: 14px 15px; background: #fafdff; color: #333333; font-size: 13px; line-height: 1.6; border-top: 1px dashed #e0e0e0; }
+            .answer-img { max-width: 100%; height: auto; margin-top: 10px; border-radius: 8px; display: block; border: 1px solid #e0e0e0; }
+            
+            /* 인기 1위 뱃지도 딥그린(#00754a) 베이스로 톤앤매너 통일 */
+            .hot-badge { background: #00754a; color: #FFFFFF; font-size: 10px; padding: 2px 7px; border-radius: 8px; font-weight: bold; }
 
             .modal-overlay {
                 position: fixed; top: 0; left: 0; width: 100%; height: 100%;
                 background: rgba(0, 0, 0, 0.4); display: flex; justify-content: center; align-items: center; z-index: 1000;
             }
             .modal-content {
-                background: white; width: 360px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+                background: #FFFFFF; width: 360px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
                 text-align: center; animation: fadeIn 0.2s ease-out;
             }
-            .modal-header { font-size: 16px; font-weight: bold; color: #e67e22; margin-bottom: 15px; text-align: left; }
-            .modal-body { font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 20px; text-align: left; background: #fafafa; padding: 15px; border-radius: 12px; border: 1px solid #eee; }
+            /* 모달 헤더 텍스트 딥그린(#00754a) */
+            .modal-header { font-size: 16px; font-weight: bold; color: #00754a; margin-bottom: 15px; text-align: left; }
+            .modal-body { font-size: 14px; color: #000000; line-height: 1.6; margin-bottom: 20px; text-align: left; background: #fdfdfd; padding: 15px; border-radius: 12px; border: 1px solid #eee; }
             
-            /* 💡 [추가] 모달창 안의 이미지 디자인 설정 */
             .modal-img { max-width: 100%; height: auto; margin-top: 10px; border-radius: 10px; border: 1px solid #ddd; display: none; }
             
-            .modal-close-btn { background: #3498db; color: white; border: none; padding: 10px 30px; font-size: 14px; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.2s; width: 100%; }
-            .modal-close-btn:hover { background: #2980b9; }
+            /* 확인 버튼을 시그니처 딥그린(#00754a)으로 강조 */
+            .modal-close-btn { background: #00754a; color: #FFFFFF; border: none; padding: 11px 30px; font-size: 14px; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.2s; width: 100%; }
+            .modal-close-btn:hover { background: #005938; }
 
             @keyframes fadeIn {
                 from { opacity: 0; transform: scale(0.95); }
@@ -93,7 +101,7 @@ def index():
     <body>
         <div class="faq-container">
             <div class="faq-box">
-                <h2 style="text-align: center; color: #2c3e50; margin-bottom: 25px;">도움말 센터</h2>
+                <h2 style="text-align: center; color: #000000; margin-bottom: 25px; font-weight: 800;">도움말 센터</h2>
 
                 <div class="top3-section">
                     <div class="top3-title">🔥 실시간 인기 질문</div>
@@ -130,7 +138,7 @@ def index():
                             <img src="{{ item.image_url }}" class="answer-img" alt="도움말 이미지">
                             {% endif %}
                             
-                            <div style="font-size: 11px; color: #ccc; margin-top: 8px;">
+                            <div style="font-size: 11px; color: #999; margin-top: 8px;">
                                 조회수: <span id="count-{{ item.id }}" class="click-number">{{ item.click_count }}</span>
                             </div>
                         </div>
@@ -155,6 +163,9 @@ def index():
         </div>
 
         <script>
+            // [카드 배경 리셋용 색상 상수 정의]
+            const MINT_BG = "#d4e9e2";
+
             function triggerClick(id) {
                 fetch('/update_click', {
                     method: 'POST',
@@ -234,9 +245,9 @@ def index():
                     const safeAnswer = item.answer.replace(/'/g, "\\'");
                     const safeImageUrl = item.imageUrl.replace(/'/g, "\\'");
 
-                    // 💡 [수정] 카드가 재생성될 때도 openModal 함수에 이미지 URL 주소를 안전하게 넘겨주도록 처리
+                    // 💡 상단 카드 리셋 시 선배님의 연민트 색상(#d4e9e2)이 유지되도록 적용
                     const cardHtml = `
-                        <div class="top3-card" id="top3-card-${item.id}" onclick="openModal('${safeQuestion}', '${safeAnswer}', '${item.id}', '${safeImageUrl}')" data-faq-id="${item.id}">
+                        <div class="top3-card" style="background: ${MINT_BG};" id="top3-card-${item.id}" onclick="openModal('${safeQuestion}', '${safeAnswer}', '${item.id}', '${safeImageUrl}')" data-faq-id="${item.id}">
                             <span class="top3-rank">TOP ${index + 1}</span>
                             <span class="top3-text">${item.question}</span>
                         </div>
@@ -245,13 +256,11 @@ def index():
                 });
             }
 
-            // 💡 [수정] 이미지 URL 인자(imgUrl)를 추가로 받아서 처리합니다.
             function openModal(question, answer, id, imgUrl) {
                 document.getElementById('modal-title').innerText = "💡 " + question;
                 document.getElementById('modal-body').innerText = answer;
                 
                 const modalImg = document.getElementById('modal-image');
-                // 이미지 URL이 실제로 존재하면 <img> 태그를 보여주고 주소를 매핑합니다.
                 if (imgUrl && imgUrl.trim() !== "" && imgUrl !== "NULL") {
                     modalImg.src = imgUrl;
                     modalImg.style.display = "block";
