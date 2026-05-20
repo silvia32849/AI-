@@ -15,7 +15,7 @@ function MenuScreen() {
     if (showFAQ) return;
     const timer = setTimeout(() => {
       setShowFAQ(true);
-    }, 10000);
+    }, 30000);
     return () => clearTimeout(timer);
   }, [showFAQ]);
 
