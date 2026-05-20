@@ -14,7 +14,7 @@ def index():
     response = supabase.table("faqs").select("*").execute()
     faqs = response.data
 
-    # 3. 전체에서 조회수 높은 TOP 3 뽑기
+    # 3. 전체에서 조회수 높은 TOP 3 뽑기 (초기 로딩용)
     top_3_faqs = sorted(faqs, key=lambda x: x.get('click_count', 0), reverse=True)[:3]
 
     # 4. 카테고리 순서 정의
@@ -50,7 +50,7 @@ def index():
             
             .top3-card { 
                 min-width: 130px; max-width: 140px; background: #fff8ed; border: 1px solid #ffeaa7; padding: 12px; 
-                border-radius: 12px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.2s;
+                border-radius: 12px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s ease;
                 word-break: break-all; white-space: normal; line-height: 1.4;
             }
             .top3-card:hover { transform: translateY(-3px); box-shadow: 0 5px 10px rgba(0,0,0,0.05); }
@@ -90,11 +90,11 @@ def index():
 
                 <div class="top3-section">
                     <div class="top3-title">🔥 실시간 인기 질문</div>
-                    <div class="top3-card-container">
+                    <div id="top3-container" class="top3-card-container">
                         {% for item in top_3 %}
-                        <div class="top3-card" onclick='openModal({{ item.question|tojson|safe }}, {{ item.answer|tojson|safe }}, "{{ item.id }}")'>
+                        <div class="top3-card" id="top3-card-{{ item.id }}" onclick="openModal({{ item.question|tojson|safe }}, {{ item.answer|tojson|safe }}, '{{ item.id }}')" data-faq-id="{{ item.id }}">
                             <span class="top3-rank">TOP {{ loop.index }}</span>
-                            {{ item.question }}
+                            <span class="top3-text">{{ item.question }}</span>
                         </div>
                         {% endfor %}
                     </div>
@@ -107,7 +107,7 @@ def index():
                 <details class="category-group" data-category-group="{{ category }}">
                     <summary>{{ category }}</summary>
                     {% for item in items %}
-                    <details class="question-item" data-faq-id="{{ item.id }}" ontoggle="if(this.open) triggerClick('{{ item.id }}')">
+                    <details class="question-item" id="faq-item-{{ item.id }}" data-faq-id="{{ item.id }}" data-question-text="{{ item.question }}" data-answer-text="{{ item.answer }}" ontoggle="if(this.open) triggerClick('{{ item.id }}')">
                         <summary>
                             <span class="q-text">{{ item.question }}</span>
                             <span class="badge-container">
@@ -152,6 +152,7 @@ def index():
                         if (target) {
                             target.textContent = data.new_count;
                             updateCategoryBadges();
+                            updateTop3Cards();
                         }
                     }
                 })
@@ -191,6 +192,40 @@ def index():
                 });
             }
 
+            function updateTop3Cards() {
+                const allFaqItems = document.querySelectorAll('.question-item');
+                let faqList = [];
+
+                allFaqItems.forEach(item => {
+                    const id = item.getAttribute('data-faq-id');
+                    const question = item.getAttribute('data-question-text');
+                    const answer = item.getAttribute('data-answer-text');
+                    const countEl = document.getElementById('count-' + id);
+                    const count = countEl ? (parseInt(countEl.textContent.trim(), 10) || 0) : 0;
+                    
+                    faqList.push({ id, question, answer, count });
+                });
+
+                faqList.sort((a, b) => b.count - a.count);
+                const top3Data = faqList.slice(0, 3);
+
+                const container = document.getElementById('top3-container');
+                container.innerHTML = '';
+
+                top3Data.forEach((item, index) => {
+                    const safeQuestion = item.question.replace(/'/g, "\\'");
+                    const safeAnswer = item.answer.replace(/'/g, "\\'");
+
+                    const cardHtml = `
+                        <div class="top3-card" id="top3-card-${item.id}" onclick="openModal('${safeQuestion}', '${safeAnswer}', '${item.id}')" data-faq-id="${item.id}">
+                            <span class="top3-rank">TOP ${index + 1}</span>
+                            <span class="top3-text">${item.question}</span>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', cardHtml);
+                });
+            }
+
             function openModal(question, answer, id) {
                 document.getElementById('modal-title').innerText = "💡 " + question;
                 document.getElementById('modal-body').innerText = answer;
@@ -209,6 +244,7 @@ def index():
     final_data = {cat: grouped_faqs[cat] for cat in category_order if cat in grouped_faqs}
     return render_template_string(html_template, final_data=final_data, top_3=top_3_faqs)
 
+# 💡 [버그 수정 완료] 오타 구역을 제거하고 무조건 'click_count'로만 수집 및 반영하도록 고쳤습니다.
 @app.route('/update_click', methods=['POST'])
 def update_click():
     data = request.json
