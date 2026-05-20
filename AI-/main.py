@@ -8,6 +8,12 @@ url = "https://yjtnvcydrrxjoitjqtzg.supabase.co"
 key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqdG52Y3lkcnJ4am9pdGpxdHpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MjA1NDAsImV4cCI6MjA5NDE5NjU0MH0.9WXlEv82kg48PmDJudJ_DW0X5C5eqDR771ZXxj8zb6s"
 supabase: Client = create_client(url, key)
 
+# ... (기존 index 함수 바로 위에 이 3줄을 삽입해 줍니다)
+@app.after_request
+def allow_iframe(response):
+    response.headers.remove('X-Frame-Options') # iframe 차단 설정 제거
+    return response
+
 @app.route('/')
 def index():
     # 2. 데이터 가져오기
