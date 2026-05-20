@@ -12,13 +12,16 @@ function BarcodeScreen() {
 
   const isSimplePay = barcodeData?.is_simple_pay;
 
-  const isEnough = isSimplePay
-  ? true
-  : finalPrice === 0;
+  const isEnough = finalPrice === 0;
+
+  console.log(barcodeData);
+console.log("finalPrice:", finalPrice);
+console.log("isEnough:", isEnough);
+console.log("isSimplePay:", isSimplePay);
 
 useEffect(() => {
 
-  if (isSimplePay) {
+  if (isSimplePay && finalPrice === 0) {
 
     navigate('/complete', {
       state: {
@@ -30,60 +33,77 @@ useEffect(() => {
 
   }
 
-}, [isSimplePay, navigate, item, barcodeData]);
+}, [isSimplePay, finalPrice, navigate, item, barcodeData]);
 
 const handleUse = () => {
 
+  // 잔액 부족 → 추가 결제
   if (!isEnough) {
 
-
     navigate('/payment', {
-  state: {
-    item,
-    discountedPrice: finalPrice,
-  }
-});
+      state: {
+        item,
+        discountedPrice: finalPrice,
+      }
+    });
 
     return;
   }
 
-  navigate('/payment', {
+  // 잔액 충분 → 바로 완료
+  navigate('/complete', {
     state: {
       item,
-      discountedPrice: finalPrice,
+      payType: barcodeData?.partner_name,
+      barcodeData
     }
   });
 };
 
   return (
     <div style={styles.container}>
+      <div style={styles.checkmark}>✓</div>
+
       <h2 style={styles.title}>바코드 결제</h2>
 
       <div style={styles.barcodeBox}>
-        <p style={styles.barcodeNum}>{barcodeData?.code || '----'}</p>
-      </div>
-
+ 
       <div style={styles.infoBox}>
-        <div style={styles.infoRow}>
-          <span>명칭</span>
-          <span style={styles.infoValue}>{barcodeData?.type}</span>
-        </div>
-        <div style={styles.infoRow}>
-        <span>원가</span>
 
-        <span style={styles.infoValue}>
-          {barcodeData?.original_price?.toLocaleString()}원
-        </span>
-      </div>
+  <div style={styles.infoRow}>
+    <span>명칭</span>
+    <span style={styles.infoValue}>
+      {barcodeData?.partner_name}
+    </span>
+  </div>
 
+  <div style={styles.infoRow}>
+    <span>원가</span>
+
+    <span style={styles.infoValue}>
+      {barcodeData?.original_price?.toLocaleString()}원
+    </span>
+  </div>
+
+  {barcodeData?.is_simple_pay && (
+  <div style={styles.infoRow}>
+    <span>사용 금액</span>
+
+    <span style={styles.infoValue}>
+      -{(barcodeData?.original_price - finalPrice).toLocaleString()}원
+    </span>
+  </div>
+)}
+
+      {barcodeData?.telecom_discount > 0 && (
       <div style={styles.infoRow}>
         <span>통신사 할인</span>
 
         <span style={styles.infoValue}>
-          -{barcodeData?.telecom_discount?.toLocaleString()}원
+          -{barcodeData.telecom_discount.toLocaleString()}원
         </span>
       </div>
-
+    )}
         <div style={{...styles.infoRow, marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #f0f0f0'}}>
           <span style={styles.finalLabel}>결제 금액</span>
           <span style={{
@@ -96,24 +116,25 @@ const handleUse = () => {
             결제를 진행해주세요.
           </p>
         )}
-      </div>
+        </div>
 
-      <div style={styles.btnWrapper}>
-        <button
-          style={styles.retryBtn}
-          onClick={() => navigate('/barcode-camera', { state: { item } })}
-        >
-          재조회
-        </button>
-        <button
-          style={{
-            ...styles.useBtn,
-            backgroundColor: isEnough ? '#00754a' : '#d32f2f'
-          }}
-          onClick={handleUse}
-        >
-          {isEnough ? '사용' : '결제수단 선택'}
-        </button>
+        <div style={styles.btnWrapper}>
+          <button
+            style={styles.retryBtn}
+            onClick={() => navigate('/barcode-camera', { state: { item } })}
+          >
+            재조회
+          </button>
+          <button
+            style={{
+              ...styles.useBtn,
+              backgroundColor: isEnough ? '#00754a' : '#d32f2f'
+            }}
+            onClick={handleUse}
+          >
+            {isEnough ? '사용' : '결제수단 선택'}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -137,6 +158,18 @@ const styles = {
     backgroundColor: '#fafafa', padding: '32px',
     borderRadius: '12px', minWidth: '400px'
   },
+  checkmark: { 
+    fontSize: '80px', 
+    color: '#00754a',
+    width: '120px',
+    height: '120px',
+    border: '4px solid #00754a',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 'bold'
+  },
   infoRow: {
     display: 'flex', justifyContent: 'space-between',
     fontSize: '18px', marginBottom: '12px',
@@ -149,7 +182,12 @@ const styles = {
     color: '#d32f2f', fontSize: '16px', 
     textAlign: 'center', marginTop: '12px' 
   },
-  btnWrapper: { display: 'flex', gap: '20px' },
+  btnWrapper: {
+  display: 'flex',
+  gap: '20px',
+  justifyContent: 'center',
+  width: '100%'
+},
   retryBtn: {
     padding: '14px 36px', fontSize: '18px',
     borderRadius: '25px', border: '2px solid #00754a',

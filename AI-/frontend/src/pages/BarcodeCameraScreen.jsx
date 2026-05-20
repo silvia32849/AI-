@@ -28,7 +28,7 @@ function BarcodeCameraScreen() {
 
       html5QrCode.stop().catch(function() {});
 
-      fetch("http://192.168.0.12:5000/process", {
+      fetch("http://172.29.34.154:5000/process", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

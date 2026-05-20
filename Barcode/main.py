@@ -107,6 +107,7 @@ def process_checkout(
     ) = calculate_price.calculate_price(
 
         original_price,
+        partner_name,
         partner_discount,
         telecom_discount
     )

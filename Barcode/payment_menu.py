@@ -10,7 +10,7 @@ def detect_payment_type(barcode):
 
         return "네이버페이"
 
-    elif barcode.startswith("281"):
+    elif barcode.startswith("881"):
 
         return "카카오페이"
 
