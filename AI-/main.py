@@ -3,17 +3,21 @@ from supabase import create_client, Client
 
 app = Flask(__name__)
 
+# 1. 서영님의 Supabase 정보
 url = "https://yjtnvcydrrxjoitjqtzg.supabase.co"
 key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqdG52Y3lkcnJ4am9pdGpxdHpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MjA1NDAsImV4cCI6MjA5NDE5NjU0MH0.9WXlEv82kg48PmDJudJ_DW0X5C5eqDR771ZXxj8zb6s"
 supabase: Client = create_client(url, key)
 
 @app.route('/')
 def index():
+    # 2. 데이터 가져오기
     response = supabase.table("faqs").select("*").execute()
     faqs = response.data
 
+    # 3. 전체에서 조회수 높은 TOP 3 뽑기
     top_3_faqs = sorted(faqs, key=lambda x: x.get('click_count', 0), reverse=True)[:3]
 
+    # 4. 카테고리 순서 정의
     category_order = ["💳 카드 / 결제", "📱 쿠폰 / 바코드", "🥤 이용방법", "기타"]
     grouped_faqs = {cat: [] for cat in category_order}
     
@@ -23,6 +27,7 @@ def index():
             grouped_faqs[cat] = []
         grouped_faqs[cat].append(item)
 
+    # 5. 각 카테고리 내부 정렬 및 1등 질문 표시
     for cat in grouped_faqs:
         if grouped_faqs[cat]:
             grouped_faqs[cat].sort(key=lambda x: x.get('click_count', 0), reverse=True)
@@ -132,54 +137,39 @@ def index():
         </div>
 
         <script>
-    // 이미 클릭된 항목을 기록하여 중복 카운트 방지
-    let clickedMap = {};
+            // 💡 중복 제어 변수(clickedMap)를 완전히 지웠습니다.
 
-    function triggerClick(id) {
-        // 이미 이번 페이지 세션에서 클릭했다면 리턴
-        if (clickedMap[id]) return;
-        clickedMap[id] = true;
+            function triggerClick(id) {
+                // 누를 때마다 무조건 서버에 전송하고 처리합니다.
+                fetch('/update_click', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: id})
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        let target = document.getElementById('count-' + id);
+                        if (target) {
+                            // 누른 만큼 올라간 최신 DB 값을 실시간으로 꽂아줍니다.
+                            target.textContent = data.new_count;
+                        }
+                    }
+                })
+                .catch(err => console.error("조회수 업데이트 실패:", err));
+            }
 
-        // 화면에 조회수가 표시된 엘리먼트가 있는지 확인
-        let target = document.getElementById('count-' + id);
-        let nextNum = 1; // 기본값
+            function openModal(question, answer, id) {
+                document.getElementById('modal-title').innerText = "💡 " + question;
+                document.getElementById('modal-body').innerText = answer;
+                document.getElementById('custom-modal').style.display = 'flex';
+                triggerClick(id);
+            }
 
-        if (target) {
-            let currentNum = parseInt(target.textContent.trim(), 10) || 0;
-            nextNum = currentNum + 1;
-            target.textContent = nextNum; // 즉시 새로고침 없이 화면 반영
-        } else {
-            // 만약 화면에 엘리먼트가 없더라도 DB에는 반영하기 위해 
-            // 현재 click_count 값을 정확히 모르므로, 백엔드에서 +1을 해주는 것이 안전합니다.
-            // 아래 대안을 참고해 주세요.
-        }
-
-        // 백엔드로 비동기(Fetch) 요청 보내기
-        fetch('/update_click', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({id: id, count: nextNum})
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log("조회수 업데이트 성공:", data);
-        })
-        .catch(err => console.error("조회수 업데이트 실패:", err));
-    }
-
-    function openModal(question, answer, id) {
-        document.getElementById('modal-title').innerText = "💡 " + question;
-        document.getElementById('modal-body').innerText = answer;
-        document.getElementById('custom-modal').style.display = 'flex';
-        
-        // 모달창이 열릴 때도 실시간 조회수 증가 함수 호출
-        triggerClick(id);
-    }
-
-    function closeModal() {
-        document.getElementById('custom-modal').style.display = 'none';
-    }
-</script>
+            function closeModal() {
+                document.getElementById('custom-modal').style.display = 'none';
+            }
+        </script>
     </body>
     </html>
     """
@@ -193,13 +183,12 @@ def update_click():
     faq_id = data.get('id')
     
     try:
-        # DB에서 현재 click_count 값을 안전하게 새로 가져옴
         row = supabase.table("faqs").select("click_count").eq("id", faq_id).single().execute()
         if row.data:
             current_count = row.data.get('click_count', 0)
-            # 가져온 값에 정확히 +1을 해서 업데이트
-            supabase.table("faqs").update({"click_count": current_count + 1}).eq("id", faq_id).execute()
-            return jsonify({"status": "success", "new_count": current_count + 1})
+            new_count = current_count + 1
+            supabase.table("faqs").update({"click_count": new_count}).eq("id", faq_id).execute()
+            return jsonify({"status": "success", "new_count": new_count})
     except Exception as e:
         print(f"조회수 업데이트 중 오류 발생: {e}")
         
