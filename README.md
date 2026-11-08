@@ -4,7 +4,7 @@
 
 AI융합개론 기말 프로젝트 (14조) · 성신여자대학교
 
-[메인 화면](.docs/images/mainscreen.png)
+[메인 화면](mainscreen.png)
 
 
 ---
@@ -52,7 +52,7 @@ EASY CAFE는 UI를 예쁘게 바꾸는 데서 그치지 않고, **사용자의 �
 첫 화면(매장/포장) → 메뉴 탐색 → (30초 무반응 시 스마트 헬퍼) → 바코드 간편결제 → 주문 완료
 ```
 
-[사용자 흐름](.docs/images/workflow.png)
+[사용자 흐름](workflow.png)
 
 ## 🛠 기술 스택
 
