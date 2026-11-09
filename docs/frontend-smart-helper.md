@@ -139,7 +139,13 @@ useEffect(() => {
 
 ## 4. 사용 기술
 
-React · JavaScript · <!-- TODO: 사용한 스타일링, 라우팅, HTTP 클라이언트 등 -->
+| 구분 | 기술 | 사용한 곳 |
+|---|---|---|
+| 프레임워크 | React (Create React App, `react-scripts`) | 키오스크 화면 구성 |
+| 언어 | JavaScript (JSX) | 화면 컴포넌트, 스마트 헬퍼 로직 |
+| 상태·타이머 | React Hooks (`useState`, `useEffect`), `setTimeout` | 팝업 표시 상태 관리, 30초 무반응 타이머 |
+| 화면 연동 | `iframe` | 백엔드(Flask)가 제공하는 FAQ 페이지를 모달 팝업으로 표시 |
+| 협업 연동 | Flask, Supabase (팀원 담당) | FAQ 데이터 제공, 조회수 갱신 |
 
 ## 5. 폴더 구조
 
