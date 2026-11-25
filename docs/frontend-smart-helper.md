@@ -41,13 +41,24 @@ flowchart LR
 `frontend/src/MenuScreen.js`
 
 ```jsx
-// 30초 동안 FAQ를 열지 않으면 도움 팝업을 자동으로 띄운다
+// 30초 동안 아무 입력이 없으면 도움 팝업을 자동으로 띄운다
 useEffect(() => {
-  if (showFAQ) return;                 // FAQ가 열려 있으면 타이머를 걸지 않음
-  const timer = setTimeout(() => {
-    setShowFAQ(true);                  // 30초 뒤 상태값 변경 → FAQ 팝업 렌더링
-  }, 30000);
-  return () => clearTimeout(timer);    // 화면을 벗어나거나 상태가 바뀌면 타이머 정리
+  if (showFAQ) return; // FAQ가 열려 있으면 타이머·리스너를 걸지 않음
+
+  let timer;
+  const startTimer = () => {
+    clearTimeout(timer);                       // 입력이 있을 때마다 타이머 리셋
+    timer = setTimeout(() => setShowFAQ(true), 30000);
+  };
+
+  const events = ['click', 'touchstart', 'keydown'];
+  events.forEach((e) => window.addEventListener(e, startTimer));
+  startTimer();                                // 화면 진입 시 첫 타이머 시작
+
+  return () => {                               // 화면을 벗어나거나 팝업이 열리면 정리
+    clearTimeout(timer);
+    events.forEach((e) => window.removeEventListener(e, startTimer));
+  };
 }, [showFAQ]);
 ```
 
