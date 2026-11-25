@@ -4,7 +4,7 @@
 
 EASY CAFE 키오스크의 **프론트엔드 화면 구성**과 **스마트 헬퍼 모듈**을 담당했습니다.
 
-[smart-helper](./images/smart-helper.gif)
+![smart-helper](./images/smart-helper.gif)
 
 ---
 
@@ -85,9 +85,9 @@ useEffect(() => {
 | 바코드 인식 | 카메라 화면과 안내 문구 |
 | 결제·주문 완료 | 할인 적용 내역, 추가 결제 안내, 주문 완료 화면 |
 
-[첫화면](.docs/images/mainscreen.png)
-[메뉴탐색](.docs/images/menuscreen.png)
-[결제·주문 완료](.docs/images/paymentscreen.png)
+![첫화면](.docs/images/mainscreen.png)
+![메뉴탐색](.docs/images/menuscreen.png)
+![결제·주문 완료](.docs/images/paymentscreen.png)
 
 ### 설계 시 신경 쓴 점
 - 처음 보는 사람도 헤매지 않도록 카테고리 탭 기반의 단순한 메뉴 구조
