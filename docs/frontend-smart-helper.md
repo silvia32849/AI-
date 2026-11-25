@@ -41,23 +41,27 @@ flowchart LR
 `frontend/src/MenuScreen.js`
 
 ```jsx
-// 30초 동안 아무 입력이 없으면 도움 팝업을 자동으로 띄운다
+const IDLE_MS = 30000; // 입력이 없을 때 도움 팝업을 띄우기까지의 시간(30초)
+
+// 30초 동안 입력이 없으면 FAQ 팝업을 자동으로 띄운다
 useEffect(() => {
   if (showFAQ) return; // FAQ가 열려 있으면 타이머·리스너를 걸지 않음
 
   let timer;
   const startTimer = () => {
-    clearTimeout(timer);                       // 입력이 있을 때마다 타이머 리셋
-    timer = setTimeout(() => setShowFAQ(true), 30000);
+    clearTimeout(timer); // 입력이 있을 때마다 타이머를 처음부터 다시 시작
+    timer = setTimeout(() => setShowFAQ(true), IDLE_MS);
   };
 
-  const events = ['click', 'touchstart', 'keydown'];
-  events.forEach((e) => window.addEventListener(e, startTimer));
-  startTimer();                                // 화면 진입 시 첫 타이머 시작
+  // capture(true): 버튼의 stopPropagation()에 막히지 않고 모든 입력을 감지
+  const events = ['click', 'touchstart', 'keydown', 'scroll'];
+  events.forEach((e) => window.addEventListener(e, startTimer, true));
+  startTimer(); // 화면 진입 시 첫 타이머 시작
 
-  return () => {                               // 화면을 벗어나거나 팝업이 열리면 정리
+  return () => {
+    // 화면을 벗어나거나 팝업이 열리면 타이머와 리스너를 함께 정리
     clearTimeout(timer);
-    events.forEach((e) => window.removeEventListener(e, startTimer));
+    events.forEach((e) => window.removeEventListener(e, startTimer, true));
   };
 }, [showFAQ]);
 ```
