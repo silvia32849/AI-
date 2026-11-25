@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import menuData from '../data/menuData';
 
+const IDLE_MS = 30000; // 입력이 없을 때 도움 팝업을 띄우기까지의 시간(30초)
+
 function MenuScreen() {
 const navigate = useNavigate();
 const location = useLocation();
@@ -11,17 +13,29 @@ const [selectedCategory, setSelectedCategory] = useState('추천메뉴');
 const [selectedItem, setSelectedItem] = useState(null);
 const [showFAQ, setShowFAQ] = useState(false);
 
+
+// 스마트 헬퍼: 30초 동안 입력이 없으면 FAQ 팝업을 자동으로 띄운다
 useEffect(() => {
-if (showFAQ) return;
-const timer = setTimeout(() => {
-setShowFAQ(true);
-}, 30000);
-return () => clearTimeout(timer);
+  if (showFAQ) return; // FAQ가 열려 있으면 타이머·리스너를 걸지 않음
+
+  let timer;
+  const startTimer = () => {
+    clearTimeout(timer); // 입력이 있을 때마다 타이머를 처음부터 다시 시작
+    timer = setTimeout(() => setShowFAQ(true), IDLE_MS);
+  };
+
+  // capture(true): 버튼의 stopPropagation()에 막히지 않고 모든 입력을 감지
+  const events = ['click', 'touchstart', 'keydown', 'scroll'];
+  events.forEach((e) => window.addEventListener(e, startTimer, true));
+  startTimer(); // 화면 진입 시 첫 타이머 시작
+
+  return () => {
+    // 화면을 벗어나거나 팝업이 열리면 타이머와 리스너를 함께 정리
+    clearTimeout(timer);
+    events.forEach((e) => window.removeEventListener(e, startTimer, true));
+  };
 }, [showFAQ]);
 
-const handleUserAction = () => {
-if (!showFAQ) setShowFAQ(false);
-};
 
 const handlePayment = () => {
 if (!selectedItem) return alert('메뉴를 선택해주세요!');
@@ -29,8 +43,7 @@ navigate('/payment', { state: { item: selectedItem, orderType } });
 };
 
 return (
-<div style={styles.container} onClick={handleUserAction}>
-
+<div style={styles.container}>
 <div style={styles.header}>
 <button
 style={styles.homeBtn}
